@@ -1,0 +1,5 @@
+{
+  "name": "Clifford Torus Stereographic Projection",
+  "description": "An interactive WebGL visualization of the stereographic projection of points on a Clifford torus, inspired by the work of Clayton Shonkwiler. Adjust rotation parameters to explore the intricate, evolving patterns.",
+  "requestFramePermissions": []
+}
