@@ -74,11 +74,11 @@ export const useTorusAnimation = (
 ) => {
   const [isDragging, setIsDragging] = useState(false);
   const rotation = useRef({ x: Math.PI / 4, y: Math.PI / 4 });
-  const pointsRef = useRef<Array<{ original: Point4D; color: string }>>([]);
+  const pointsRef = useRef<Array<{ id: number; original: Point4D; color: string }>>([]);
 
   const generatePoints = useCallback((count: number) => {
     const colorScale = d3.scaleSequential(d3.interpolateViridis);
-    const newPoints = Array.from({ length: count }, () => {
+    const newPoints = Array.from({ length: count }, (_, i) => {
       const theta = Math.random() * 2 * Math.PI;
       const phi = Math.random() * 2 * Math.PI;
       const point: Point4D = [
@@ -87,7 +87,7 @@ export const useTorusAnimation = (
         SQRT1_2 * Math.cos(phi),
         SQRT1_2 * Math.sin(phi),
       ];
-      return { original: point, color: colorScale(phi / (2 * Math.PI)) };
+      return { id: i, original: point, color: colorScale(phi / (2 * Math.PI)) };
     });
     pointsRef.current = newPoints;
   }, []);
@@ -111,8 +111,6 @@ export const useTorusAnimation = (
     });
     resizeObserver.observe(svg.node()!);
 
-    const pointSelection = svg.selectAll<SVGCircleElement, ProjectedPoint>('circle');
-    
     const drag = d3.drag<SVGSVGElement, unknown>()
       .on('start', () => setIsDragging(true))
       .on('drag', (event) => {
@@ -145,6 +143,7 @@ export const useTorusAnimation = (
         const scale = Math.min(width, height) * 0.4;
         
         return {
+          id: p.id,
           x: width / 2 + rotated3D[0] * scale * perspective,
           y: height / 2 - rotated3D[1] * scale * perspective,
           z: rotated3D[2],
@@ -154,8 +153,8 @@ export const useTorusAnimation = (
 
       projectedPoints.sort((a, b) => a.z - b.z);
 
-      pointSelection
-        .data(projectedPoints, (_, i) => i)
+      svg.selectAll<SVGCircleElement, ProjectedPoint>('circle')
+        .data(projectedPoints, (d: ProjectedPoint) => d.id)
         .join('circle')
         .attr('cx', d => d.x)
         .attr('cy', d => d.y)

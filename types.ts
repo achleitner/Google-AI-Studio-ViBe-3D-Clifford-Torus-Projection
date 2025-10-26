@@ -2,6 +2,7 @@
 export type Point4D = [number, number, number, number];
 export type Point3D = [number, number, number];
 export type ProjectedPoint = {
+  id: number;
   x: number;
   y: number;
   z: number;
